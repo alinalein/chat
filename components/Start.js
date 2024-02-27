@@ -9,7 +9,7 @@ const Start = ({ navigation }) => {
         <ScrollView contentContainerStyle={{ flex: 1 }}>
             <ImageBackground source={require('../assets/BackgroundImage.png')} resizeMode="cover" style={styles.image}>
                 {/* Child components go here */}
-                <Text style={[styles.text, { fontSize: 45 }]}>Chat App</Text>
+                <Text style={[styles.text, { fontSize: 45, height: '35%', marginTop: '15%' }]}>Chat App</Text>
                 <View style={styles.containerWhite}>
                     <View style={styles.containerName}>
                         <Image source={require('../assets/iconName.png')} style={styles.icon} />
@@ -104,7 +104,6 @@ const styles = StyleSheet.create({
     },
     textColor: {
         color: '#757083',
-        opacity: 0.5,
         fontSize: 16
     },
     colorOptions: {
