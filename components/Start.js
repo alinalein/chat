@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TouchableOpacity, TextInput, ScrollView, ImageBackground, Image } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, TextInput, ScrollView, ImageBackground, Image, Platform, KeyboardAvoidingView } from 'react-native';
 import { useState } from 'react';
 
 
@@ -50,6 +50,8 @@ const Start = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
             </ImageBackground>
+            {/* makes sure keyboard will not cover everything on Iphone */}
+            {Platform.OS === "ios" ? <KeyboardAvoidingView behavior="padding" /> : null}
         </ScrollView>
     );
 }
@@ -114,7 +116,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         padding: 20,
         margin: 5,
-        borderWidth: 2,
+        borderWidth: 3,
         borderColor: 'transparent',
         width: 50, // Set the total size of the touchable area
         height: 50,
