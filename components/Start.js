@@ -18,7 +18,10 @@ const Start = ({ navigation }) => {
                             value={name}
                             onChangeText={setName}
                             placeholder='Your name'
-
+                            accessible={true}
+                            accessibilityLabel="Enter your name"
+                            accessibilityHint="Type your name here, this name will be visible to others in the chat"
+                            accessibilityRole="input field"
                         />
                     </View>
                     <View style={styles.containerColor}>
@@ -45,7 +48,10 @@ const Start = ({ navigation }) => {
                     <TouchableOpacity style={styles.startButton}
                         // prop is passed to every component included in the Stack.Navigator, and contains a set of methods used to navigate to other screens.
                         onPress={() => navigation.navigate('Chat', { name: name, color: color })}
-                    >
+                        accessible={true}
+                        accessibilityLabel="Enter the chat"
+                        accessibilityHint="Press the button to open a new window and start chatting with others"
+                        accessibilityRole="button">
                         <Text style={[styles.text, { fontSize: 16 }]}>Start chatting</Text>
                     </TouchableOpacity>
                 </View>
