@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, View, KeyboardAvoidingView, Platform } from 'react-native';
-import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { GiftedChat, Bubble, SystemMessage, Day } from "react-native-gifted-chat";
 
 const Chat = ({ route, navigation }) => {
     //extract name of the route
@@ -35,16 +35,52 @@ const Chat = ({ route, navigation }) => {
             },
         ]);
     }, []);
+    const renderDay = (props) => {
+        return (
+            <Day
+                {...props}
+                textStyle={{
+                    color: 'black',
+                    backgroundColor: ' rgba(248,248,248,0.6)',
+                    paddingHorizontal: 15,
+                    paddingVertical: 5,
+                    fontWeight: '500',
+                    borderRadius: 10,
+
+                }}
+            />
+        );
+    };
+    const renderSystemMessage = (props) => {
+        return (
+            <SystemMessage
+                {...props}
+                textStyle={{
+                    color: 'black',
+                    backgroundColor: ' rgba(248,248,248,0.6)',
+                    paddingHorizontal: 15,
+                    paddingVertical: 5,
+                    fontWeight: '500',
+                    borderRadius: 10,
+                    margin: 3
+                }}
+            />
+        );
+    };
     const renderBubble = (props) => {
         return (
             <Bubble
-                // pass all the properties received by the renderBubble function down to the Bubble component
                 {...props}
-                // textStyle={{
-                //     right: { color: 'blue', backgroundColor: 'gray' },
-                // }}
+                timeTextStyle={{
+                    right: {
+                        color: 'black',
+                    }
+                }}
+                textStyle={{
+                    right: { color: 'black', },
+                }}
                 wrapperStyle={{
-                    right: { backgroundColor: '#000', },
+                    right: { backgroundColor: '#d3edf8', },
                     left: { backgroundColor: '#FFF', },
                 }}
             />
@@ -61,12 +97,15 @@ const Chat = ({ route, navigation }) => {
             tell if what should happen  when the user sends a new message  */}
             <GiftedChat style={styles.chat}
                 messages={messages}
+                renderSystemMessage={renderSystemMessage}
                 renderBubble={renderBubble}
+                renderDay={renderDay}
                 // call the function onUserSend -> when user sends new message
                 onSend={messages => onSend(messages)}
                 user={{
                     _id: 1
                 }}
+
             />
             {/* if platform’s OS is Android -> add component KeyboardAvoidingView, otherwise do nothing
             makes sure keyboard will not overlap the UI  */}
