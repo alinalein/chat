@@ -21,7 +21,7 @@ const Start = ({ navigation }) => {
                             accessible={true}
                             accessibilityLabel="Enter your name"
                             accessibilityHint="Type your name here, this name will be visible to others in the chat"
-                            accessibilityRole="input field"
+                            accessibilityRole="text"
                         />
                     </View>
                     <View style={styles.containerColor}>

@@ -48,10 +48,6 @@ const Chat = ({ route, navigation }) => {
                     borderRadius: 10,
 
                 }}
-                accessible={true}
-                accessibilityLabel="Date when messages been sent"
-                accessibilityHint="Double tap to read the message"
-                accessibilityRole="text"
             />
         );
     };
@@ -68,10 +64,6 @@ const Chat = ({ route, navigation }) => {
                     borderRadius: 10,
                     margin: 3
                 }}
-                accessible={true}
-                accessibilityLabel="Message sent by the system to the chat"
-                accessibilityHint="Double tap to read the message"
-                accessibilityRole="text"
             />
         );
     };
@@ -91,10 +83,6 @@ const Chat = ({ route, navigation }) => {
                     right: { backgroundColor: '#d3edf8', },
                     left: { backgroundColor: '#FFF', },
                 }}
-                accessible={true}
-                accessibilityLabel={position === 'right' ? "Your message in the chat" : "Other person's message in the chat"}
-                accessibilityHint="Double tap to read the message"
-                accessibilityRole="text"
             />
         )
     }
