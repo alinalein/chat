@@ -2,7 +2,7 @@ import { StyleSheet, View, Text, TouchableOpacity, TextInput, ScrollView, ImageB
 import { useState } from 'react';
 
 
-const Start = ({ navigation }) => {
+const Start = ({ navigation, db }) => {
     const [name, setName] = useState('');
     const [color, setColor] = useState('');
     return (
