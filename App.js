@@ -1,8 +1,14 @@
+
+// prevents message about AsyncStorage to show -> related to "firebase/auth"
+import { LogBox } from 'react-native';
+LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // import the screens we want to navigate
 import Start from './components/Start';
 import Chat from './components/Chat';
+
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
@@ -33,19 +39,17 @@ const App = () => {
         <Stack.Screen
           //  handler that you’ll use to open or navigate to the screen-not necessarily component name
           name="Start"
-        >
-          {/* pass prop bd to start */}
-          {props => <Start db={db} {...props} />}
-        </Stack.Screen>
+          component={Start}
+        />
         <Stack.Screen
           name="Chat"
-          component={Chat}
-        />
+        >
+          {/* pass prop bd to start */}
+          {props => <Chat db={db} {...props} />}
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-});
 export default App;

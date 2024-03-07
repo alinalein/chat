@@ -1,10 +1,28 @@
-import { StyleSheet, View, Text, TouchableOpacity, TextInput, ScrollView, ImageBackground, Image, Platform, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, Alert, View, Text, TouchableOpacity, TextInput, ScrollView, ImageBackground, Image, Platform, KeyboardAvoidingView } from 'react-native';
 import { useState } from 'react';
+import { getAuth, signInAnonymously } from "firebase/auth";
 
-
-const Start = ({ navigation, db }) => {
+const Start = ({ navigation }) => {
     const [name, setName] = useState('');
     const [color, setColor] = useState('');
+
+    // returns the authentication handle of Firebase
+    const auth = getAuth();
+
+    const signInUser = () => {
+        signInAnonymously(auth)
+            // information object -> represented by results 
+            .then(result => {
+                // once user has signed in, the app navigates to the Chat screen while passing result.user.uid and other props
+                // user ID will be used to personalize the chat for each user
+                navigation.navigate('Chat', { name: name, color: color, userID: result.user.uid })
+                Alert.alert("Signed in Successfully!");
+            })
+            .catch((error) => {
+                Alert.alert("Unable to sign in, try later again.");
+                console.error(error)
+            })
+    }
     return (
         <ScrollView contentContainerStyle={{ flex: 1 }}>
             <ImageBackground source={require('../assets/BackgroundImage.png')} resizeMode="cover" style={styles.image}>
@@ -47,7 +65,7 @@ const Start = ({ navigation, db }) => {
                     </View>
                     <TouchableOpacity style={styles.startButton}
                         // prop is passed to every component included in the Stack.Navigator, and contains a set of methods used to navigate to other screens.
-                        onPress={() => navigation.navigate('Chat', { name: name, color: color })}
+                        onPress={signInUser}
                         accessible={true}
                         accessibilityLabel="Enter the chat"
                         accessibilityHint="Press the button to open a new window and start chatting with others"

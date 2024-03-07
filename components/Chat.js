@@ -1,40 +1,38 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, View, KeyboardAvoidingView, Platform } from 'react-native';
 import { GiftedChat, Bubble, SystemMessage, Day } from "react-native-gifted-chat";
+import { collection, onSnapshot, addDoc, query, where, orderBy } from "firebase/firestore";
 
-const Chat = ({ route, navigation }) => {
-    //extract name of the route
-    const { name, color } = route.params;
+const Chat = ({ route, navigation, db }) => {
+    //extract name , color, userID of the route send ny Start.js
+    const { name, color, userID } = route.params;
     const [messages, setMessages] = useState([]);
 
     const onSend = (newMessages) => {
-        // callback function passed , appends new message to newMessages array, 
-        // what is then appended to previousMessages, so it can be displayed in the chat
-        // previousMessages->receives the previous state & returns the new state
-        setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages))
+        // callback function passed , to save /add passed message to the database
+        // message to be added is first item in newMassages array [0]
+        addDoc(collection(db, "messages"), newMessages[0])
     }
     // set static message -> allows to see each element of the UI displayed on the screen right away
     useEffect(() => {
-        setMessages([
-            // formal & code given by Gifted Chat
-            {
-                _id: 1,
-                text: "Hello developer",
-                createdAt: new Date(),
-                user: {
-                    _id: 2,
-                    name: "React Native",
-                    avatar: "https://th.bing.com/th/id/OIP.B0rthnTNM4Ix99QEbH4TlAHaHw?rs=1&pid=ImgDetMain",
-                },
-            },
-            {
-                _id: 2,
-                text: 'This is a system message',
-                createdAt: new Date(),
-                system: true,
-            },
-        ]);
+        const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+        const unsubMessages = onSnapshot(q,
+            (documentsSnapshot) => {
+                let newMessages = [];
+                documentsSnapshot.forEach(doc => {
+                    newMessages.push({ id: doc.id, ...doc.data(), createdAt: new Date(doc.data().createdAt.toMillis()) })
+                });
+                setMessages(newMessages);
+            });
+        return () => {
+            if (unsubMessages) unsubMessages();
+        }
     }, []);
+    // will be called once, after component is mounted, set name to title of website 
+    useEffect(() => {
+        navigation.setOptions({ title: name });
+    }, []);
+
     const renderDay = (props) => {
         return (
             <Day
@@ -86,10 +84,8 @@ const Chat = ({ route, navigation }) => {
             />
         )
     }
-    // will be called once, after component is mounted, set name to title 
-    useEffect(() => {
-        navigation.setOptions({ title: name });
-    }, []);
+
+
     return (
         <View style={[styles.container, { backgroundColor: color }]}>
             {/* <Text>Enjoy meeting new people online.</Text> */}
@@ -103,7 +99,7 @@ const Chat = ({ route, navigation }) => {
                 // call the function onUserSend -> when user sends new message
                 onSend={messages => onSend(messages)}
                 user={{
-                    _id: 1
+                    _id: userID
                 }}
             />
             {/* if platform’s OS is Android -> add component KeyboardAvoidingView, otherwise do nothing
