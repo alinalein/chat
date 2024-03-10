@@ -1,6 +1,6 @@
 
 // prevents message about AsyncStorage to show -> related to "firebase/auth"
-import { LogBox } from 'react-native';
+import { LogBox, Alert } from 'react-native';
 LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
 
 import { NavigationContainer } from '@react-navigation/native';
@@ -9,8 +9,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Start from './components/Start';
 import Chat from './components/Chat';
 
+import { useEffect } from "react";
+import { useNetInfo } from '@react-native-community/netinfo';
+
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, disableNetwork, enableNetwork } from "firebase/firestore";
 
 //returns an object containing two components, Navigator and Screen
 const Stack = createNativeStackNavigator();
@@ -28,7 +31,16 @@ const App = () => {
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const connectionStatus = useNetInfo();
 
+  useEffect(() => {
+    if (connectionStatus.isConnected === false) {
+      Alert.alert('You are not longer connected to the internet!')
+      disableNetwork(db)
+    } else {
+      enableNetwork(db)
+    }
+  }, [connectionStatus.isConnected])
   return (
     // responsible for managing your app state and linking your top-level navigator to the app environment
     <NavigationContainer>
@@ -45,7 +57,7 @@ const App = () => {
           name="Chat"
         >
           {/* pass prop bd to start */}
-          {props => <Chat db={db} {...props} />}
+          {props => <Chat isConnected={connectionStatus.isConnected} db={db} {...props} />}
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
