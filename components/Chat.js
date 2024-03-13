@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, View, KeyboardAvoidingView, Platform } from 'react-native';
 import { GiftedChat, Bubble, SystemMessage, Day, InputToolbar } from "react-native-gifted-chat";
-import { collection, onSnapshot, addDoc, query, where, orderBy } from "firebase/firestore";
+import { collection, onSnapshot, addDoc, query, orderBy } from "firebase/firestore";
+import CustomActions from './CustomActions';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import MapView from 'react-native-maps';
 
-const Chat = ({ route, navigation, db, isConnected }) => {
+const Chat = ({ route, navigation, db, isConnected, storage }) => {
     //extract name , color, userID of the route send ny Start.js
     const { name, color, userID } = route.params;
     const [messages, setMessages] = useState([]);
@@ -115,22 +117,67 @@ const Chat = ({ route, navigation, db, isConnected }) => {
     const renderInputToolbar = (props) => {
         if (isConnected === true) {
             return (
+                // passes all props received by renderInputToolbar like isConnected to component 
+                // InputToolbar from Gifted Chat, imported above
                 <InputToolbar
                     {...props}
                 />
             )
         } else return null;
     }
+
+    // resposible for the action button -> + 
+    const renderCustomActions = (props) => {
+        return (
+            // pass all the props received by renderCustomActions to CustomActions component
+            <CustomActions
+                storage={storage} userID={userID} {...props}
+            />
+        )
+    }
+
+    // adding location data to the message object 
+    const renderCustomView = (props) => {
+        // extract current message object from the props 
+        const { currentMessage } = props;
+        //  checks if the currentMessage object contains a location property -> attach the location object in the getLocation()
+        // wne need to render mutiple custom views -> do that by addinf if statemets for the additional custom views
+        // if (currentMessage.3dModel) -> render a small 3d model viewport
+        if (currentMessage.location) {    // render a map
+            return (
+                <MapView
+                    style={{
+                        width: 150,
+                        height: 100,
+                        borderRadius: 13,
+                        margin: 3
+                    }}
+                    region={{
+                        latitude: currentMessage.location.latitude,
+                        longitude: currentMessage.location.longitude,
+                        latitudeDelta: 0.0922,
+                        longitudeDelta: 0.0421,
+                    }}
+                />
+            );
+        }
+        return null;
+    }
+
     return (
         <View style={[styles.container, { backgroundColor: color }]}>
             {/* <Text>Enjoy meeting new people online.</Text> */}
-            {/* component from  Gifted Chat -> comes with own props, 
+            {/* component from  Gifted Chat -> comes with own props, all in blue are the props
             tell if what should happen  when the user sends a new message  */}
             <GiftedChat style={styles.chat}
                 messages={messages}
                 renderSystemMessage={renderSystemMessage}
                 renderBubble={renderBubble}
                 renderDay={renderDay}
+                // call the component CustomActions from inside the function renderCustomActions 
+                // & pass it to prop renderActions-> those props passed to GiftedChat -< customize the behaviour 
+                renderActions={renderCustomActions}
+                renderCustomView={renderCustomView}
                 renderInputToolbar={renderInputToolbar}
                 // call the function onUserSend -> when user sends new message
                 onSend={messages => onSend(messages)}
