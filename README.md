@@ -18,6 +18,32 @@ time.
 ● As a user with a visual impairment, I want to use a chat app that is compatible with a screen
 reader so that I can engage with a chat interface.
 
+## Getting started 
+
+### Clone the repository:
+
+```
+git clone https://github.com/alinalein/chat.git
+```
+
+### Change the directory:
+
+```
+cd chat
+```
+
+### Install the dependencies
+
+```
+npm install
+```
+
+### Run the server
+
+```
+npm start
+```
+
 ## App User Interface
-<img width="143" alt="image" src="https://github.com/alinalein/chat/assets/111589183/54fd57f6-f4e7-4ab3-ae36-42276918fdb7">
+<img width="140" alt="image" src="https://github.com/alinalein/chat/assets/111589183/ab0bba88-bae7-4115-a04e-9be34959d41f">
 
