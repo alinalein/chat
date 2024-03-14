@@ -50,6 +50,9 @@ npm install
 ```
 npm start
 ```
+### On your emulator or the Expo Go app on your phone, click on the running link after logging in to your Expo account
+
+<img width="134" alt="image" src="https://github.com/alinalein/chat/assets/111589183/39ff7a54-eca7-4e8e-b308-330979264c84">
 
 ## App User Interface
 <img width="140" alt="image" src="https://github.com/alinalein/chat/assets/111589183/ab0bba88-bae7-4115-a04e-9be34959d41f">
