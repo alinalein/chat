@@ -17,3 +17,7 @@ time.
 
 ● As a user with a visual impairment, I want to use a chat app that is compatible with a screen
 reader so that I can engage with a chat interface.
+
+## App User Interface
+<img width="143" alt="image" src="https://github.com/alinalein/chat/assets/111589183/54fd57f6-f4e7-4ab3-ae36-42276918fdb7">
+
