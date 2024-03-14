@@ -38,7 +38,7 @@ npm install -g expo-cli
 - Firebase Authentication: Activate anonymous authentication for the app.
 - Firebase Storage: Activate storage by clicking on "Start now" and set its rules to:  allow read, write: if **true**;
 - Configuration: Under the project settings, add a new app and follow the steps provided by Firebase until you obtain the configuration code.
-  ```
+```
   const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_AUTH_DOMAIN",
