@@ -1,7 +1,7 @@
-
 // prevents message about AsyncStorage to show -> related to "firebase/auth"
 import { LogBox, Alert } from 'react-native';
-LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
+import AsyncStorage from '@react-native-async-storage/async-storage';
+LogBox.ignoreLogs(['You are initializing Firebase Auth for React Native without providing AsyncStorage. Auth state will default to memory persistence and will not persist between sessions. In order to persist auth state, install the package "@react-native-async-storage/async-storage" and provide it to initializeAuth:']);
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -49,11 +49,11 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator
         //the first screen to load upon starting your app- should be name of one of the screens
-        initialRouteName="Start"
+        initialRouteName="Chat App"
       >
         <Stack.Screen
           //  handler that you’ll use to open or navigate to the screen-not necessarily component name
-          name="Start"
+          name="Chat App"
           component={Start}
         />
         <Stack.Screen

@@ -57,6 +57,7 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
             if (unsubMessages) unsubMessages();
         }
     }, [isConnected]);
+
     // will be called once, after component is mounted, set name to title of website 
     useEffect(() => {
         navigation.setOptions({ title: name });
@@ -166,7 +167,6 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
 
     return (
         <View style={[styles.container, { backgroundColor: color }]}>
-            {/* <Text>Enjoy meeting new people online.</Text> */}
             {/* component from  Gifted Chat -> comes with own props, all in blue are the props
             tell if what should happen  when the user sends a new message  */}
             <GiftedChat style={styles.chat}
