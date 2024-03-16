@@ -2,7 +2,7 @@
 import { LogBox, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 LogBox.ignoreLogs(['You are initializing Firebase Auth for React Native without providing AsyncStorage. Auth state will default to memory persistence and will not persist between sessions. In order to persist auth state, install the package "@react-native-async-storage/async-storage" and provide it to initializeAuth:']);
-
+import { REACT_APP_FIREBASE_API_KEY, REACT_APP_FIREBASE_AUTH_DOMAIN, REACT_APP_FIREBASE_PROJECT_ID, REACT_APP_FIREBASE_STORAGE_BUCKET, REACT_APP_FIREBASE_MESSAGING_SENDER_ID, REACT_APP_FIREBASE_APP_ID } from "@env";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // import the screens we want to navigate
@@ -22,12 +22,12 @@ const Stack = createNativeStackNavigator();
 const App = () => {
   //web app's Firebase configuration
   const firebaseConfig = {
-    apiKey: "AIzaSyB0vTEvHAe3tc31hOdYVFIkxNe6-XNWtag",
-    authDomain: "chat-7e2b7.firebaseapp.com",
-    projectId: "chat-7e2b7",
-    storageBucket: "chat-7e2b7.appspot.com",
-    messagingSenderId: "67703424854",
-    appId: "1:67703424854:web:d97447d9b499ecd8ebf8f7"
+    apiKey: REACT_APP_FIREBASE_API_KEY,
+    authDomain: REACT_APP_FIREBASE_AUTH_DOMAIN,
+    projectId: REACT_APP_FIREBASE_PROJECT_ID,
+    storageBucket: REACT_APP_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+    appId: REACT_APP_FIREBASE_APP_ID
   };
 
   const app = initializeApp(firebaseConfig);
