@@ -85,5 +85,8 @@ npm start
 <img width="200" alt="image" src="https://github.com/alinalein/chat/assets/111589183/39ff7a54-eca7-4e8e-b308-330979264c84">
 
 ## App User Interface
-<img width="140" alt="image" src="https://github.com/alinalein/chat/assets/111589183/ab0bba88-bae7-4115-a04e-9be34959d41f">
+![image](https://github.com/alinalein/chat/assets/111589183/09cf7ad3-9428-40a5-8dcb-ffedff7c515f)
+ ![image](https://github.com/alinalein/chat/assets/111589183/0d63ef2b-cfa5-4a13-8f3e-f82d5202117d)
+
+
 
