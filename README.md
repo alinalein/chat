@@ -16,7 +16,7 @@ npm install -g expo-cli
 ```
 
 ### 2. Database configuration
-- Please cretae a Firebase Account & then a new project in the Firebase console: https://console.firebase.google.com/
+- Please create a Firebase Account & then a new project in the Firebase console: https://console.firebase.google.com/
 - Cloud Firestore DB: Initialize a new database and set its rules to:  allow read, write: if **true**;
 - Firebase Authentication: Activate anonymous authentication for the app.
 - Firebase Storage: Activate storage by clicking on "Start now" and set its rules to:  allow read, write: if **true**;
