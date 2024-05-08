@@ -7,34 +7,37 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import MapView from 'react-native-maps';
 
 const Chat = ({ route, navigation, db, isConnected, storage }) => {
-    //extract name , color, userID of the route send ny Start.js
+    // extract name , color, userID of the route send by Start.js
     const { name, color, userID } = route.params;
     const [messages, setMessages] = useState([]);
 
+    // loads a message from the cache if one was previously cached
     const loadCache = async () => {
         // if something is cached ->gets the cached list from string messages, otherwise empty array
         const cachedList = await AsyncStorage.getItem('user_messages') || [];
         setMessages(JSON.parse(cachedList))
     }
+
     const cacheMessages = async (messagesToCache) => {
         try {
-            //cache collection/documents that been loaded from the Firestore DB
+            // cache collection/documents that been loaded from the Firestore DB
             await AsyncStorage.setItem('user_messages', JSON.stringify(messagesToCache))
         } catch (error) {
             console.error(error.message)
         }
     }
+
     const onSend = (newMessages) => {
         // callback function passed , to save /add passed message to the database
         // message to be added is first item in newMassages array [0]
         addDoc(collection(db, "messages"), newMessages[0])
     }
 
-    // set static message -> allows to see each element of the UI displayed on the screen right away
+    // set static message: allows to see each element of the UI displayed on the screen right away
     useEffect(() => {
         let unsubMessages;
         if (isConnected === true) {
-            //make sure there is always only one onSnapshot listener
+            // make sure there is always only one onSnapshot listener
             if (unsubMessages) unsubMessages();
             unsubMessages = null;
             // get collection and its document-> ordered by "createdAt" in descending order.
@@ -44,7 +47,7 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
                 (documentsSnapshot) => {
                     let newMessages = [];
                     documentsSnapshot.forEach(doc => {
-                        //new Date(doc.data().createdAt.toMillis()) retrieves the milliseconds representation of the Firestore timestamp and converts it to a Date object.
+                        // new Date(doc.data().createdAt.toMillis()) retrieves the milliseconds representation of the Firestore timestamp and converts it to a Date object.
                         newMessages.push({ id: doc.id, ...doc.data(), createdAt: new Date(doc.data().createdAt.toMillis()) })
                     });
                     cacheMessages(newMessages)
@@ -52,7 +55,7 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
                 });
         }
         else loadCache();
-        // unsubscribes from the snapshot listener to prevent memory leaks.
+        // unsubscribes from the snapshot listener to prevent memory leaks
         return () => {
             if (unsubMessages) unsubMessages();
         }
@@ -79,6 +82,7 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
             />
         );
     };
+
     const renderSystemMessage = (props) => {
         return (
             <SystemMessage
@@ -95,6 +99,7 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
             />
         );
     };
+
     const renderBubble = (props) => {
         return (
             <Bubble
@@ -118,7 +123,7 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
     const renderInputToolbar = (props) => {
         if (isConnected === true) {
             return (
-                // passes all props received by renderInputToolbar like isConnected to component 
+                // passes all received props by renderInputToolbar, like isConnected to component 
                 // InputToolbar from Gifted Chat, imported above
                 <InputToolbar
                     {...props}
@@ -141,8 +146,8 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
     const renderCustomView = (props) => {
         // extract current message object from the props 
         const { currentMessage } = props;
-        //  checks if the currentMessage object contains a location property -> attach the location object in the getLocation()
-        // wne need to render mutiple custom views -> do that by addinf if statemets for the additional custom views
+        // checks if the currentMessage object contains a location property -> attach the location object in the getLocation()
+        // when  need to render mutiple custom views -> do that by adding if statemets for the additional custom views
         // if (currentMessage.3dModel) -> render a small 3d model viewport
         if (currentMessage.location) {    // render a map
             return (
@@ -175,7 +180,7 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
                 renderBubble={renderBubble}
                 renderDay={renderDay}
                 // call the component CustomActions from inside the function renderCustomActions 
-                // & pass it to prop renderActions-> those props passed to GiftedChat -< customize the behaviour 
+                // & pass it to prop renderActions -> those props passed to GiftedChat -> customize the behaviour 
                 renderActions={renderCustomActions}
                 renderCustomView={renderCustomView}
                 renderInputToolbar={renderInputToolbar}

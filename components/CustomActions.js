@@ -5,14 +5,13 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-import { useState } from 'react';
-
 // receives the props from Gifted Chat / storage from App.js
 const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID }) => {
 
-    //includes showActionSheetWithOptions() function, which will initialize and show the ActionSheet
+    // includes showActionSheetWithOptions() function, which will initialize and show the ActionSheet
     const actionSheet = useActionSheet();
 
+    // calls a function depending on the action button chosen by the user 
     const onActionPress = () => {
         const options = ['Choose From Library', 'Take Picture', 'Send Location', 'Cancel'];
         // to get the index of cancel -> index 3
@@ -24,7 +23,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
             },
             async (buttonIndex) => {
                 switch (buttonIndex) {
-                    // dependig on index of button another function 
+                    // depending on the button index, calls a specific function
                     case 0:
                         pickImage();
                         return;
@@ -44,7 +43,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
         if (permissions?.granted) {
             const location = await Location.getCurrentPositionAsync({});
             if (location) {
-                // if permission granted by user, add the location object to the onSend prop, that passes needed properties to show location
+                // if permission granted by user, adds the location object to the onSend prop, which passes the necessary properties to show the location
                 // properties like createdAt, _id, and user will be added by default 
                 onSend({
                     location: {
@@ -61,9 +60,9 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
         // new reference for it on the Storage Cloud
         // ref imported frm Firebase/storage , then prop , then reference string ->identifier to retrieve / download file
         const newUploadRef = ref(storage, uniqueRefString);
-        // to fetch content from the URI 
+        // fetches content from the URI
         const response = await fetch(imageURI);
-        // now convert the content got from fetch to blob , that Firestore storage can store it 
+        // now converts the fetched content to a blob so Firestore storage can store it
         const blob = await response.blob();
         // 1 -> reference that the file will be uploaded to / 2 -> blob of the image file you want to upload
         uploadBytes(newUploadRef, blob).then(async (snapshot) => {
@@ -85,6 +84,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
             else Alert.alert("Permissions haven't been granted.");
         }
     }
+
     const takePhoto = async () => {
         let permissions = await ImagePicker.requestCameraPermissionsAsync();
         if (permissions?.granted) {
@@ -93,10 +93,10 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
             else Alert.alert("Permissions haven't been granted.");
         }
     }
-    // allows to upload multiple images , combines multiple strings  -> unique reference string for img to be uploaded
+    // allows to upload multiple images , by combining multiple strings that generate unique reference string for img to be uploaded
     // one argument to represents the picked image’s URI
     const generateReference = (uri) => {
-        // represented in milliseconds since the Unix epoch (January 1, 1970, 00:00:00 UTC).
+        // represented in milliseconds since the Unix epoch (January 1, 1970, 00:00:00 UTC)
         const timeStamp = (new Date()).getTime();
         // gets the file path , then seperates by / and gets index of last array element -> name of img 
         const imageName = uri.split("/")[uri.split("/").length - 1];
@@ -114,6 +114,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
         </TouchableOpacity>
     )
 }
+
 const styles = StyleSheet.create({
     container: {
         width: 26,

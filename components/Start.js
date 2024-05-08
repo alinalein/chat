@@ -43,7 +43,7 @@ const Start = ({ navigation }) => {
                         />
                     </View>
                     <View style={styles.containerColor}>
-                        <Text style={styles.textColor}>Choose Backround color:</Text>
+                        <Text style={styles.textColor}>Choose Background color:</Text>
                         <View style={styles.colorOptions}>
                             <TouchableOpacity
                                 style={[styles.colorOption, { backgroundColor: '#090C08' }, color === '#090C08' && { borderColor: '#B9C6AE' }]}
@@ -64,7 +64,7 @@ const Start = ({ navigation }) => {
                         </View>
                     </View>
                     <TouchableOpacity style={styles.startButton}
-                        // prop is passed to every component included in the Stack.Navigator, and contains a set of methods used to navigate to other screens.
+                        // prop is passed to every component included in the Stack.Navigator, and contains a set of methods used to navigate to other screens
                         onPress={signInUser}
                         accessible={true}
                         accessibilityLabel="Enter the chat"

@@ -16,11 +16,11 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, disableNetwork, enableNetwork } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-//returns an object containing two components, Navigator and Screen
+// returns an object containing two components, Navigator and Screen
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-  //web app's Firebase configuration
+  // web apps Firebase configuration
   const firebaseConfig = {
     apiKey: REACT_APP_FIREBASE_API_KEY,
     authDomain: REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -36,6 +36,7 @@ const App = () => {
   const storage = getStorage(app);
   const connectionStatus = useNetInfo();
 
+  // called when the user goes from online to offline and vice versa.
   useEffect(() => {
     if (connectionStatus.isConnected === false) {
       Alert.alert('You are not longer connected to the internet!')
@@ -44,15 +45,16 @@ const App = () => {
       enableNetwork(db)
     }
   }, [connectionStatus.isConnected])
+
   return (
-    // responsible for managing your app state and linking your top-level navigator to the app environment
+    // responsible for managing  app state and linking the top-level navigator to the app environment
     <NavigationContainer>
       <Stack.Navigator
-        //the first screen to load upon starting your app- should be name of one of the screens
+        // the first screen to load upon starting the app: should be name of one of the screens
         initialRouteName="Chat App"
       >
         <Stack.Screen
-          //  handler that you’ll use to open or navigate to the screen-not necessarily component name
+          // handler that is used to open or navigate to the screen: not necessarily component name
           name="Chat App"
           component={Start}
         />
