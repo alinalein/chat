@@ -84,7 +84,8 @@ As a user with a visual impairment, I want to use a chat app that is compatible 
 
 ## App User Interface
 ![image](https://github.com/alinalein/chat/assets/111589183/5bbe15e9-b121-4f36-8121-ebb71913304e)
-![image](https://github.com/alinalein/chat/assets/111589183/54f02200-5004-46c2-94f7-68769873823c)
+![image](https://github.com/alinalein/chat/assets/111589183/b3e65154-3439-4431-aca6-b01c5be8619b)
+
 
 
 
