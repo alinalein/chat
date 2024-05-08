@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, View, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, View, KeyboardAvoidingView, TouchableOpacity, Platform, Text, Alert } from 'react-native';
 import { GiftedChat, Bubble, SystemMessage, Day, InputToolbar } from "react-native-gifted-chat";
 import { collection, onSnapshot, addDoc, query, orderBy } from "firebase/firestore";
 import CustomActions from './CustomActions';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MapView from 'react-native-maps';
+import { Audio } from "expo-av";
 
 const Chat = ({ route, navigation, db, isConnected, storage }) => {
     // extract name , color, userID of the route send by Start.js
     const { name, color, userID } = route.params;
     const [messages, setMessages] = useState([]);
+    let soundObject = null;
 
     // loads a message from the cache if one was previously cached
     const loadCache = async () => {
@@ -58,6 +60,8 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
         // unsubscribes from the snapshot listener to prevent memory leaks
         return () => {
             if (unsubMessages) unsubMessages();
+            // cleans the soundObject if there was an audio
+            if (soundObject) soundObject.unloadAsync();
         }
     }, [isConnected]);
 
@@ -170,6 +174,53 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
         return null;
     }
 
+    const playSound = async (audioUri) => {
+        try {
+            // settings to play audio on iOS
+            await Audio.setAudioModeAsync({
+                allowsRecordingIOS: false,
+                staysActiveInBackground: true,
+                playsInSilentModeIOS: true,
+                shouldDuckAndroid: true,
+                playThroughEarpieceAndroid: false,
+                // Ensure the sound plays through the speakers
+                defaultToSpeaker: true
+            });
+            if (soundObject) {
+                await soundObject.unloadAsync();
+            }
+            // console.log("Attempting to play sound from URI:", audioUri);
+            const { sound } = await Audio.Sound.createAsync({
+                uri: audioUri
+            });
+            // assign the audio from the uri to the set soundObject
+            soundObject = sound;
+            // console.log("Sound loaded, playing...");
+            await soundObject.playAsync();
+        } catch (error) {
+            console.error('Error playing sound', error);
+            Alert.alert("Error", "Failed to play the sound.");
+        }
+    }
+
+    const renderMessageAudio = (props) => {
+        return (
+            <View {...props}>
+                <TouchableOpacity
+                    style={{
+                        backgroundColor: "#cce7ff", borderRadius: 10, margin: 5
+                    }}
+                    // call playSound function and pass the audio prop from the current message  from sendRecordedSound function
+                    onPress={() => playSound(props.currentMessage.audio)}
+                >
+                    <Text style={{
+                        textAlign: "center", color: 'black', padding: 5
+                    }}>Play Sound</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
     return (
         <View style={[styles.container, { backgroundColor: color }]}>
             {/* component from  Gifted Chat -> comes with own props, all in blue are the props
@@ -184,6 +235,7 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
                 renderActions={renderCustomActions}
                 renderCustomView={renderCustomView}
                 renderInputToolbar={renderInputToolbar}
+                renderMessageAudio={renderMessageAudio}
                 // call the function onUserSend -> when user sends new message
                 onSend={messages => onSend(messages)}
                 user={{
