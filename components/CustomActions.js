@@ -26,7 +26,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
     // calls a function depending on the action button chosen by the user 
     const onActionPress = () => {
         const options = ['Choose From Library', 'Take Picture', 'Send Location', 'Record a Sound', 'Cancel'];
-        // to get the index of cancel -> index 3
+        // to get the index of cancel -> index (4-1)= will come after 3
         const cancelButtonIndex = options.length - 1;
         actionSheet.showActionSheetWithOptions(
             {
@@ -66,13 +66,13 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
                 // tell createAsync() to create a high quality audio
                 Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY)
                     .then(results => {
-                        // extract the recording from the promisse 
+                        // extract the recording from the promise 
                         return results.recording;
                     }).then(recording => {
                         // then assign the recording to the set up recordedObject
                         recordedObject = recording;
                         // after user started the recording check if user really wanted to record 
-                        // buy prompting him to chosse one of the options
+                        // by prompting him to chosse one of the options
                         Alert.alert('You are recording...', undefined, [
                             { text: 'Cancel', onPress: () => { stopRecording() } },
                             {
@@ -100,7 +100,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
 
     const sendRecordedSound = async () => {
         await stopRecording()
-        // user generateReference function to create te reference
+        // use the generateReference function to create te reference
         const uniqueRefString =
             generateReference(recordedObject.getURI());
         // upload the new audio to storage
@@ -148,7 +148,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
             console.log('File has been uploaded successfully');
             // retrieves the download URL of the uploaded file from Firebase Storage
             const imageURL = await getDownloadURL(snapshot.ref)
-            // passing object containing the URL under the key image to onSend prop. so img shown in messages
+            // passing object containing the URL under the key image to onSend prop, so img shown in messages
             onSend({ image: imageURL })
         })
     }
@@ -160,7 +160,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
             if (!result.canceled) {
                 await uploadAndSendImage(result.assets[0].uri) // imageURI = result.assets[0].uri
             }
-            else Alert.alert("Permissions haven't been granted.");
+            else Alert.alert("Image selection canceled.");
         }
     }
 
@@ -169,7 +169,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
         if (permissions?.granted) {
             let result = await ImagePicker.launchCameraAsync();
             if (!result.canceled) await uploadAndSendImage(result.assets[0].uri); // imageURI = result.assets[0].uri
-            else Alert.alert("Permissions haven't been granted.");
+            else Alert.alert("Camera use canceled.");
         }
     }
 

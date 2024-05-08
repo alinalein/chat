@@ -44,12 +44,12 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
             unsubMessages = null;
             // get collection and its document-> ordered by "createdAt" in descending order.
             const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
-            // sets up a listener to listen for any changes to the documents in the "messages" collection. Whenever there's a change, the callback function will be called.
+            // sets up a listener to listen for any changes to the documents in the "messages" collection. Whenever there's a change, the callback function will be called
             unsubMessages = onSnapshot(q,
                 (documentsSnapshot) => {
                     let newMessages = [];
                     documentsSnapshot.forEach(doc => {
-                        // new Date(doc.data().createdAt.toMillis()) retrieves the milliseconds representation of the Firestore timestamp and converts it to a Date object.
+                        // new Date(doc.data().createdAt.toMillis()) retrieves the milliseconds representation of the Firestore timestamp and converts it to a Date object
                         newMessages.push({ id: doc.id, ...doc.data(), createdAt: new Date(doc.data().createdAt.toMillis()) })
                     });
                     cacheMessages(newMessages)
@@ -136,7 +136,7 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
         } else return null;
     }
 
-    // resposible for the action button -> + 
+    // resposible for the action button -> +
     const renderCustomActions = (props) => {
         return (
             // pass all the props received by renderCustomActions to CustomActions component
@@ -151,7 +151,7 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
         // extract current message object from the props 
         const { currentMessage } = props;
         // checks if the currentMessage object contains a location property -> attach the location object in the getLocation()
-        // when  need to render mutiple custom views -> do that by adding if statemets for the additional custom views
+        // when you need to render multiple custom views, do so by adding if statements for the additional custom views
         // if (currentMessage.3dModel) -> render a small 3d model viewport
         if (currentMessage.location) {    // render a map
             return (
