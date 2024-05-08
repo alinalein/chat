@@ -22,7 +22,8 @@
     "react": "18.2.0",
     "react-native": "0.73.4",
     "react-native-gifted-chat": "^2.4.0",
-    "react-native-maps": "1.10.0"
+    "react-native-maps": "1.10.0",
+    "expo-av": "~13.10.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

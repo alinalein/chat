@@ -1,9 +1,11 @@
-import { StyleSheet, TouchableOpacity, View, Text } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, Text, Alert } from 'react-native';
 // function's job is to fetch whatever ActionSheet is included inside the wrapper component, from gifted chat
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { Audio } from "expo-av" // two main classes Audio.Recording: handles recording and Audio.Sound: handles sound
+import { useEffect } from 'react';
 
 // receives the props from Gifted Chat / storage from App.js
 const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID }) => {
@@ -11,9 +13,19 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
     // includes showActionSheetWithOptions() function, which will initialize and show the ActionSheet
     const actionSheet = useActionSheet();
 
+    // initialize recording object 
+    let recordedObject = null;
+
+    // in case user didnt cancel the recording but also didnt sent , clear the recordingObject 
+    useEffect(() => {
+        return () => {
+            if (recordedObject) recordedObject.stopAndUnloadAsync();
+        }
+    }, []);
+
     // calls a function depending on the action button chosen by the user 
     const onActionPress = () => {
-        const options = ['Choose From Library', 'Take Picture', 'Send Location', 'Cancel'];
+        const options = ['Choose From Library', 'Take Picture', 'Send Location', 'Record a Sound', 'Cancel'];
         // to get the index of cancel -> index 3
         const cancelButtonIndex = options.length - 1;
         actionSheet.showActionSheetWithOptions(
@@ -32,10 +44,77 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
                         return;
                     case 2:
                         getLocation();
+                        return;
+                    case 3:
+                        startRecording()
+                        return;
                     default:
                 }
             },
         );
+    }
+
+    const startRecording = async () => {
+        try {
+            let permissions = await Audio.requestPermissionsAsync();
+            if (permissions?.granted) {
+                // iOS specific config to allow recording on iPhone devices
+                await Audio.setAudioModeAsync({
+                    allowsRecordingIOS: true,
+                    playsInSilentModeIOS: true
+                });
+                // tell createAsync() to create a high quality audio
+                Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY)
+                    .then(results => {
+                        // extract the recording from the promisse 
+                        return results.recording;
+                    }).then(recording => {
+                        // then assign the recording to the set up recordedObject
+                        recordedObject = recording;
+                        // after user started the recording check if user really wanted to record 
+                        // buy prompting him to chosse one of the options
+                        Alert.alert('You are recording...', undefined, [
+                            { text: 'Cancel', onPress: () => { stopRecording() } },
+                            {
+                                text: 'Stop and Send', onPress: () => {
+                                    sendRecordedSound()
+                                }
+                            },
+                        ],
+                            { cancelable: false }
+                        );
+                    })
+            }
+        } catch (err) {
+            Alert.alert('Failed to record!');
+        }
+    }
+
+    const stopRecording = async () => {
+        await Audio.setAudioModeAsync({
+            allowsRecordingIOS: false,
+            playsInSilentModeIOS: false
+        });
+        await recordedObject.stopAndUnloadAsync();
+    }
+
+    const sendRecordedSound = async () => {
+        await stopRecording()
+        // user generateReference function to create te reference
+        const uniqueRefString =
+            generateReference(recordedObject.getURI());
+        // upload the new audio to storage
+        const newUploadRef = ref(storage, uniqueRefString);
+        // fetches content from the URI
+        const response = await fetch(recordedObject.getURI());
+        // now converts the fetched content to a blob so Firestore storage can store it
+        const blob = await response.blob();
+        // 1 -> reference that the file will be uploaded to / 2 -> blob of the image file you want to upload
+        uploadBytes(newUploadRef, blob).then(async (snapshot) => {
+            const soundURL = await getDownloadURL(snapshot.ref)
+            // passing object containing the URL under the key audio to onSend prop. so audio in message
+            onSend({ audio: soundURL })
+        });
     }
 
     const getLocation = async () => {
@@ -93,6 +172,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
             else Alert.alert("Permissions haven't been granted.");
         }
     }
+
     // allows to upload multiple images , by combining multiple strings that generate unique reference string for img to be uploaded
     // one argument to represents the picked image’s URI
     const generateReference = (uri) => {
