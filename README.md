@@ -1,5 +1,5 @@
 ## Chat App
-The chat app is designed for mobile devices using React Native. It provides users with a chat interface and options to chat, share images, and their location.
+The chat app is designed for mobile devices using React Native. It provides users with a chat interface and options to chat, share images, share audios and their location.
 
 ## Technology Stack 
 - **React Native** : Framework for building cross-platform mobile applications using JavaScript and React.
@@ -76,13 +76,15 @@ As a user, I want to send images to my friends to show them what I’m currently
 
 As a user, I want to share my location with my friends to show them where I am.
 
+As a user, I want to share audio recordings with my friends to keep them updated on current events.
+
 As a user, I want to be able to read my messages offline so I can reread conversations at any time.
 
 As a user with a visual impairment, I want to use a chat app that is compatible with a screen reader so that I can engage with the chat interface.
 
 ## App User Interface
-
- ![image](https://github.com/alinalein/chat/assets/111589183/0d63ef2b-cfa5-4a13-8f3e-f82d5202117d)
+![image](https://github.com/alinalein/chat/assets/111589183/5bbe15e9-b121-4f36-8121-ebb71913304e)
+![image](https://github.com/alinalein/chat/assets/111589183/54f02200-5004-46c2-94f7-68769873823c)
 
 
 
