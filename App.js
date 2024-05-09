@@ -61,7 +61,7 @@ const App = () => {
         <Stack.Screen
           name="Chat"
         >
-          {/* pass prop bd to start */}
+          {/* pass prop bd & storage to Chat component */}
           {props => <Chat isConnected={connectionStatus.isConnected} storage={storage} db={db} {...props} />}
         </Stack.Screen>
       </Stack.Navigator>

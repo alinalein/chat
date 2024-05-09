@@ -7,7 +7,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Audio } from "expo-av" // two main classes Audio.Recording: handles recording and Audio.Sound: handles sound
 import { useEffect } from 'react';
 
-// receives the props from Gifted Chat / storage from App.js
+// receives the props from Gifted Chat component / storage & userID from Chat.js
 const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID }) => {
 
     // includes showActionSheetWithOptions() function, which will initialize and show the ActionSheet
