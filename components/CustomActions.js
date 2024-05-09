@@ -7,13 +7,12 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Audio } from "expo-av" // two main classes Audio.Recording: handles recording and Audio.Sound: handles sound
 import { useEffect } from 'react';
 
-// receives the props from Gifted Chat / storage from App.js
+// receives the props from Gifted Chat component / storage & userID from Chat.js
 const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID }) => {
 
     // includes showActionSheetWithOptions() function, which will initialize and show the ActionSheet
     const actionSheet = useActionSheet();
 
-    // initialize recording object 
     let recordedObject = null;
 
     // in case user didnt cancel the recording but also didnt sent , clear the recordingObject 
@@ -26,7 +25,6 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
     // calls a function depending on the action button chosen by the user 
     const onActionPress = () => {
         const options = ['Choose From Library', 'Take Picture', 'Send Location', 'Record a Sound', 'Cancel'];
-        // to get the index of cancel -> index 3
         const cancelButtonIndex = options.length - 1;
         actionSheet.showActionSheetWithOptions(
             {
@@ -35,7 +33,6 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
             },
             async (buttonIndex) => {
                 switch (buttonIndex) {
-                    // depending on the button index, calls a specific function
                     case 0:
                         pickImage();
                         return;
@@ -63,16 +60,12 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
                     allowsRecordingIOS: true,
                     playsInSilentModeIOS: true
                 });
-                // tell createAsync() to create a high quality audio
                 Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY)
                     .then(results => {
-                        // extract the recording from the promisse 
                         return results.recording;
                     }).then(recording => {
-                        // then assign the recording to the set up recordedObject
                         recordedObject = recording;
-                        // after user started the recording check if user really wanted to record 
-                        // buy prompting him to chosse one of the options
+                        // after user started the recording check if user really wanted to record buy prompting him to chosse one of the options
                         Alert.alert('You are recording...', undefined, [
                             { text: 'Cancel', onPress: () => { stopRecording() } },
                             {
@@ -100,19 +93,14 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
 
     const sendRecordedSound = async () => {
         await stopRecording()
-        // user generateReference function to create te reference
         const uniqueRefString =
             generateReference(recordedObject.getURI());
-        // upload the new audio to storage
         const newUploadRef = ref(storage, uniqueRefString);
-        // fetches content from the URI
         const response = await fetch(recordedObject.getURI());
-        // now converts the fetched content to a blob so Firestore storage can store it
         const blob = await response.blob();
-        // 1 -> reference that the file will be uploaded to / 2 -> blob of the image file you want to upload
         uploadBytes(newUploadRef, blob).then(async (snapshot) => {
             const soundURL = await getDownloadURL(snapshot.ref)
-            // passing object containing the URL under the key audio to onSend prop. so audio in message
+            // passing object containing the URL under the key audio to onSend prop / function. so audio in message
             onSend({ audio: soundURL })
         });
     }
@@ -122,8 +110,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
         if (permissions?.granted) {
             const location = await Location.getCurrentPositionAsync({});
             if (location) {
-                // if permission granted by user, adds the location object to the onSend prop, which passes the necessary properties to show the location
-                // properties like createdAt, _id, and user will be added by default 
+                // permission granted , adds the location object to the onSend prop, which passes the necessary properties to show the location
                 onSend({
                     location: {
                         longitude: location.coords.longitude,
@@ -136,14 +123,11 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
 
     const uploadAndSendImage = async (imageURI) => {
         const uniqueRefString = generateReference(imageURI);
-        // new reference for it on the Storage Cloud
-        // ref imported frm Firebase/storage , then prop , then reference string ->identifier to retrieve / download file
+        // ref imported from Firebase/storage , then prop , then reference string ->identifier to retrieve / download file
         const newUploadRef = ref(storage, uniqueRefString);
-        // fetches content from the URI
         const response = await fetch(imageURI);
         // now converts the fetched content to a blob so Firestore storage can store it
         const blob = await response.blob();
-        // 1 -> reference that the file will be uploaded to / 2 -> blob of the image file you want to upload
         uploadBytes(newUploadRef, blob).then(async (snapshot) => {
             console.log('File has been uploaded successfully');
             // retrieves the download URL of the uploaded file from Firebase Storage
@@ -174,9 +158,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
     }
 
     // allows to upload multiple images , by combining multiple strings that generate unique reference string for img to be uploaded
-    // one argument to represents the picked image’s URI
     const generateReference = (uri) => {
-        // represented in milliseconds since the Unix epoch (January 1, 1970, 00:00:00 UTC)
         const timeStamp = (new Date()).getTime();
         // gets the file path , then seperates by / and gets index of last array element -> name of img 
         const imageName = uri.split("/")[uri.split("/").length - 1];

@@ -14,7 +14,7 @@ const Start = ({ navigation }) => {
             // information object -> represented by results 
             .then(result => {
                 // once user has signed in, the app navigates to the Chat screen while passing result.user.uid and other props
-                // user ID will be used to personalize the chat for each user
+
                 navigation.navigate('Chat', { name: name, color: color, userID: result.user.uid })
                 Alert.alert("Signed in Successfully!");
             })
@@ -23,10 +23,10 @@ const Start = ({ navigation }) => {
                 console.error(error)
             })
     }
+
     return (
         <ScrollView contentContainerStyle={{ flex: 1 }}>
             <ImageBackground source={require('../assets/BackgroundImage.png')} resizeMode="cover" style={styles.image}>
-                {/* Child components go here */}
                 <Text style={[styles.text, { fontSize: 45, height: '35%', marginTop: '15%' }]}>Chat App</Text>
                 <View style={styles.containerWhite}>
                     <View style={styles.containerName}>
@@ -64,7 +64,6 @@ const Start = ({ navigation }) => {
                         </View>
                     </View>
                     <TouchableOpacity style={styles.startButton}
-                        // prop is passed to every component included in the Stack.Navigator, and contains a set of methods used to navigate to other screens
                         onPress={signInUser}
                         accessible={true}
                         accessibilityLabel="Enter the chat"
