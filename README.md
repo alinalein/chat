@@ -83,9 +83,6 @@ As a user, I want to be able to read my messages offline so I can reread convers
 As a user with a visual impairment, I want to use a chat app that is compatible with a screen reader so that I can engage with the chat interface.
 
 ## App User Interface
-![image](https://github.com/alinalein/chat/assets/111589183/5bbe15e9-b121-4f36-8121-ebb71913304e)
-![image](https://github.com/alinalein/chat/assets/111589183/b3e65154-3439-4431-aca6-b01c5be8619b)
-
-
-
+![IMG_3750](https://github.com/alinalein/chat/assets/111589183/7214da88-6328-4e71-8c2d-cbc97b9c164a)
+![IMG_3749](https://github.com/alinalein/chat/assets/111589183/1d7af065-aeb8-4839-968b-463ae9251754)
 
