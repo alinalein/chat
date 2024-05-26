@@ -46,21 +46,50 @@ const Start = ({ navigation }) => {
                         <Text style={styles.textColor}>Choose Background color:</Text>
                         <View style={styles.colorOptions}>
                             <TouchableOpacity
-                                style={[styles.colorOption, { backgroundColor: '#090C08' }, color === '#090C08' && { borderColor: '#B9C6AE' }]}
+                                style={[
+                                    styles.outerCircle,
+                                    // change the border color to #090C08 from transparent when #090C08 selected
+                                    color === '#090C08' && { borderColor: '#090C08' }
+                                ]}
                                 onPress={() => setColor('#090C08')}
-                            />
+                            >
+                                <View style={[
+                                    styles.innerCirle,
+                                    { backgroundColor: '#090C08' },
+                                    color === '#090C08' && { borderColor: 'white' }  // White inner border on selection
+                                ]} />
+                            </TouchableOpacity>
                             <TouchableOpacity
-                                style={[styles.colorOption, { backgroundColor: '#474056' }, color === '#474056' && { borderColor: '#090C08' }]}
+                                style={[
+                                    styles.outerCircle,
+                                    color === '#474056' && { borderColor: '#474056' }
+                                ]}
                                 onPress={() => setColor('#474056')}
-                            />
+                            >
+                                <View style={[
+                                    styles.innerCirle,
+                                    { backgroundColor: '#474056' },
+                                    color === '#474056' && { borderColor: 'white' }
+                                ]} />
+                            </TouchableOpacity>
                             <TouchableOpacity
-                                style={[styles.colorOption, { backgroundColor: '#8A95A5' }, color === '#8A95A5' && { borderColor: '#474056' }]}
+                                style={[styles.outerCircle, color === '#8A95A5' && { borderColor: '#8A95A5' }]}
                                 onPress={() => setColor('#8A95A5')}
-                            />
+                            ><View style={[
+                                styles.innerCirle,
+                                { backgroundColor: '#8A95A5' },
+                                color === '#8A95A5' && { borderColor: 'white' }
+                            ]} />
+                            </TouchableOpacity>
                             <TouchableOpacity
-                                style={[styles.colorOption, { backgroundColor: '#B9C6AE' }, color === '#B9C6AE' && { borderColor: '#8A95A5' }]}
+                                style={[styles.outerCircle, color === '#B9C6AE' && { borderColor: '#B9C6AE' }]}
                                 onPress={() => setColor('#B9C6AE')}
-                            />
+                            ><View style={[
+                                styles.innerCirle,
+                                { backgroundColor: '#B9C6AE' },
+                                color === '#B9C6AE' && { borderColor: 'white' }
+                            ]} />
+                            </TouchableOpacity>
                         </View>
                     </View>
                     <TouchableOpacity style={styles.startButton}
@@ -135,15 +164,28 @@ const styles = StyleSheet.create({
     colorOptions: {
         justifyContent: 'space-between',
         flexDirection: 'row',
+        marginTop: 5
     },
-    colorOption: {
-        borderRadius: 50,
-        padding: 20,
-        margin: 5,
-        borderWidth: 3,
+    outerCircle: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: 'transparent',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2.5,
         borderColor: 'transparent',
-        width: 50, // Set the total size of the touchable area
+    },
+    innerCirle: {
+        borderRadius: 25,
+        padding: 10,
+        margin: 5,
+        borderWidth: 0.5,
+        borderColor: 'transparent',
+        width: 50,
         height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     startButton: {
         width: "88%",
