@@ -1,11 +1,12 @@
 ## Chat App
-The chat app is designed for mobile devices using React Native. It provides users with a chat interface and options to chat, share images, share audios and their location.
+The chat application is built for mobile devices with React Native, offering a chat interface that lets users send messages, share images, audio, and their location.
 
 ## Technology Stack 
 - **React Native** : Framework for building cross-platform mobile applications using JavaScript and React.
-- **Expo** :  Platform that simplifies the development of universal, native-quality mobile apps using JavaScript and React Native.
-- **Google Firestore Database / Authentication / Cloud Storage** :  Offers a scalable NoSQL database, authentication services, and cloud storage for building real-time applications.
-- **Gifted Chat library** :  React Native library providing customizable UI components for creating feature-rich messaging applications.
+- **Expo** : Platform that simplifies the development of universal, native-quality mobile apps using JavaScript and React Native.
+- **Google Firestore Database** : Scalable NoSQL database for real-time data syncing and storage across web and mobile apps.
+- **Google Firebase Authentication / Cloud Storage** : Secure sign-up/login with Authentication; Cloud Storage for safe file storage and sharing across platforms.  
+- **Gifted Chat library** : React Native library providing customizable UI components for creating feature-rich messaging applications.
 - **Expo ImagePicker API / Location API** : ImagePicker API enables integration of camera and photo library functionalities, while the Location API allows access to GPS services for location-based features in Expo apps.
   
 ## Getting started 
@@ -81,6 +82,13 @@ As a user, I want to share audio recordings with my friends to keep them updated
 As a user, I want to be able to read my messages offline so I can reread conversations at any time.
 
 As a user with a visual impairment, I want to use a chat app that is compatible with a screen reader so that I can engage with the chat interface.
+
+## Features ✅
+- Customization page where users can enter their name and select a chat background color before joining.
+- Chat screen with real-time conversation display, message input, and send button.
+- Communication options allowing users to send images (from the library or camera), voice messages, and share their location.
+- Anonymous authentication through Google Firebase. Data storage via Google Firestore Database, supporting both online and offline access.
+
 
 ## App User Interface
 <img width="300" alt="image" src="https://github.com/alinalein/chat/assets/111589183/cb26b63e-0cb1-428c-a334-2ac4efd0a697">
