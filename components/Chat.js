@@ -1,260 +1,341 @@
-import { useEffect, useState } from 'react';
-import { StyleSheet, View, KeyboardAvoidingView, TouchableOpacity, Platform, Text, Alert } from 'react-native';
-import { GiftedChat, Bubble, SystemMessage, Day, InputToolbar } from "react-native-gifted-chat";
-import { collection, onSnapshot, addDoc, query, orderBy } from "firebase/firestore";
-import CustomActions from './CustomActions';
+import { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  View,
+  KeyboardAvoidingView,
+  TouchableOpacity,
+  Platform,
+  Text,
+  Alert,
+} from "react-native";
+import {
+  GiftedChat,
+  Bubble,
+  SystemMessage,
+  Day,
+  InputToolbar,
+} from "react-native-gifted-chat";
+import {
+  collection,
+  onSnapshot,
+  addDoc,
+  query,
+  orderBy,
+} from "firebase/firestore";
+import CustomActions from "./CustomActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import MapView from 'react-native-maps';
+import MapView from "react-native-maps";
 import { Audio } from "expo-av";
+// import { useAudioPlayer } from "expo-audio";
 
 const Chat = ({ route, navigation, db, isConnected, storage }) => {
-    // extract name , color, userID of the route send by Start.js
-    const { name, color, userID } = route.params;
-    const [messages, setMessages] = useState([]);
-    let soundObject = null;
+  // extract name , color, userID of the route send by Start.js
+  const { name, color, userID } = route.params;
+  const [messages, setMessages] = useState([]);
+  let soundObject = null;
 
-    // loads a message from the cache if one was previously cached
-    const loadCache = async () => {
-        // if something is cached ->gets the cached list from string messages, otherwise empty array
-        const cachedList = await AsyncStorage.getItem('user_messages') || [];
-        setMessages(JSON.parse(cachedList))
+  // loads a message from the cache if one was previously cached
+  const loadCache = async () => {
+    // if something is cached ->gets the cached list from string messages, otherwise empty array
+    const cachedList = (await AsyncStorage.getItem("user_messages")) || [];
+    setMessages(JSON.parse(cachedList));
+  };
+
+  const cacheMessages = async (messagesToCache) => {
+    try {
+      // cache collection/documents that been loaded from the Firestore DB
+      await AsyncStorage.setItem(
+        "user_messages",
+        JSON.stringify(messagesToCache)
+      );
+    } catch (error) {
+      console.error(error.message);
     }
+  };
 
-    const cacheMessages = async (messagesToCache) => {
-        try {
-            // cache collection/documents that been loaded from the Firestore DB
-            await AsyncStorage.setItem('user_messages', JSON.stringify(messagesToCache))
-        } catch (error) {
-            console.error(error.message)
-        }
-    }
+  const onSend = (newMessages) => {
+    // callback function passed , to save /add passed message to the database
+    // message to be added is first item in newMassages array [0]
+    addDoc(collection(db, "messages"), newMessages[0]);
+  };
 
-    const onSend = (newMessages) => {
-        // callback function passed , to save /add passed message to the database
-        // message to be added is first item in newMassages array [0]
-        addDoc(collection(db, "messages"), newMessages[0])
-    }
-
-    // set static message: allows to see each element of the UI displayed on the screen right away
-    useEffect(() => {
-        let unsubMessages;
-        if (isConnected === true) {
-            // make sure there is always only one onSnapshot listener
-            if (unsubMessages) unsubMessages();
-            unsubMessages = null;
-            // get collection and its document-> ordered by "createdAt" in descending order.
-            const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
-            // sets up a listener to listen for any changes to the documents in the "messages" collection. Whenever there's a change, the callback function will be called
-            unsubMessages = onSnapshot(q,
-                (documentsSnapshot) => {
-                    let newMessages = [];
-                    documentsSnapshot.forEach(doc => {
-                        // new Date(doc.data().createdAt.toMillis()) retrieves the milliseconds representation of the Firestore timestamp and converts it to a Date object
-                        newMessages.push({ id: doc.id, ...doc.data(), createdAt: new Date(doc.data().createdAt.toMillis()) })
-                    });
-                    cacheMessages(newMessages)
-                    setMessages(newMessages);
-                });
-        }
-        else loadCache();
-        // unsubscribes from the snapshot listener to prevent memory leaks
-        return () => {
-            if (unsubMessages) unsubMessages();
-            // cleans the soundObject if there was an audio
-            if (soundObject) soundObject.unloadAsync();
-        }
-    }, [isConnected]);
-
-    // will be called once, after component is mounted, set name to title of website 
-    useEffect(() => {
-        navigation.setOptions({ title: name });
-    }, []);
-
-    const renderDay = (props) => {
-        return (
-            <Day
-                {...props}
-                textStyle={{
-                    color: 'black',
-                    backgroundColor: ' rgba(248,248,248,0.6)',
-                    paddingHorizontal: 15,
-                    paddingVertical: 5,
-                    fontWeight: '500',
-                    borderRadius: 10,
-
-                }}
-            />
-        );
+  // set static message: allows to see each element of the UI displayed on the screen right away
+  useEffect(() => {
+    let unsubMessages;
+    if (isConnected === true) {
+      // make sure there is always only one onSnapshot listener
+      if (unsubMessages) unsubMessages();
+      unsubMessages = null;
+      // get collection and its document-> ordered by "createdAt" in descending order.
+      const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+      // sets up a listener to listen for any changes to the documents in the "messages" collection. Whenever there's a change, the callback function will be called
+      unsubMessages = onSnapshot(q, (documentsSnapshot) => {
+        let newMessages = [];
+        documentsSnapshot.forEach((doc) => {
+          // new Date(doc.data().createdAt.toMillis()) retrieves the milliseconds representation of the Firestore timestamp and converts it to a Date object
+          newMessages.push({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: new Date(doc.data().createdAt.toMillis()),
+          });
+        });
+        cacheMessages(newMessages);
+        setMessages(newMessages);
+      });
+    } else loadCache();
+    // unsubscribes from the snapshot listener to prevent memory leaks
+    return () => {
+      if (unsubMessages) unsubMessages();
+      // cleans the soundObject if there was an audio
+      if (soundObject) soundObject.unloadAsync();
     };
+  }, [isConnected]);
 
-    const renderSystemMessage = (props) => {
-        return (
-            <SystemMessage
-                {...props}
-                textStyle={{
-                    color: 'black',
-                    backgroundColor: ' rgba(248,248,248,0.6)',
-                    paddingHorizontal: 15,
-                    paddingVertical: 5,
-                    fontWeight: '500',
-                    borderRadius: 10,
-                    margin: 3
-                }}
-            />
-        );
-    };
+  // will be called once, after component is mounted, set name to title of website
+  useEffect(() => {
+    navigation.setOptions({ title: name });
+  }, []);
 
-    const renderBubble = (props) => {
-        return (
-            <Bubble
-                {...props}
-                timeTextStyle={{
-                    right: {
-                        color: 'black',
-                    }
-                }}
-                textStyle={{
-                    right: { color: 'black', },
-                }}
-                wrapperStyle={{
-                    right: { backgroundColor: '#d3edf8', },
-                    left: { backgroundColor: '#FFF', },
-                }}
-            />
-        )
-    }
+  // Implemented for the ERROR:   <%s {...props} />
+  // React keys must be passed directly to JSX without using spread:
+  // But as the bug in he gifted chat node_modules it didnt fix the big
+  const stripKey = (props) => {
+    const { key, ...rest } = props;
+    return rest;
+  };
 
-    const renderInputToolbar = (props) => {
-        if (isConnected === true) {
-            return (
-                // passes all received props by renderInputToolbar, like isConnected to component 
-                // InputToolbar from Gifted Chat, imported above
-                <InputToolbar
-                    {...props}
-                />
-            )
-        } else return null;
-    }
-
-    // resposible for the action button -> +
-    const renderCustomActions = (props) => {
-        return (
-            // pass all the props received by renderCustomActions to CustomActions component
-            <CustomActions
-                storage={storage} userID={userID} {...props}
-            />
-        )
-    }
-
-    // adding location data to the message object 
-    const renderCustomView = (props) => {
-        // extract current message object from the props 
-        const { currentMessage } = props;
-        // checks if the currentMessage object contains a location property -> attach the location object in the getLocation()
-        // when you need to render multiple custom views, do so by adding if statements for the additional custom views
-        // if (currentMessage.3dModel) -> render a small 3d model viewport
-        if (currentMessage.location) {    // render a map
-            return (
-                <MapView
-                    style={{
-                        width: 150,
-                        height: 100,
-                        borderRadius: 13,
-                        margin: 3
-                    }}
-                    region={{
-                        latitude: currentMessage.location.latitude,
-                        longitude: currentMessage.location.longitude,
-                        latitudeDelta: 0.0922,
-                        longitudeDelta: 0.0421,
-                    }}
-                />
-            );
-        }
-        return null;
-    }
-
-    const playSound = async (audioUri) => {
-        try {
-            // settings to play audio on iOS
-            await Audio.setAudioModeAsync({
-                allowsRecordingIOS: false,
-                staysActiveInBackground: true,
-                playsInSilentModeIOS: true,
-                shouldDuckAndroid: true,
-                playThroughEarpieceAndroid: false,
-                // Ensure the sound plays through the speakers
-                defaultToSpeaker: true
-            });
-            if (soundObject) {
-                await soundObject.unloadAsync();
-            }
-            // console.log("Attempting to play sound from URI:", audioUri);
-            const { sound } = await Audio.Sound.createAsync({
-                uri: audioUri
-            });
-            // assign the audio from the uri to the set soundObject
-            soundObject = sound;
-            // console.log("Sound loaded, playing...");
-            await soundObject.playAsync();
-        } catch (error) {
-            console.error('Error playing sound', error);
-            Alert.alert("Error", "Failed to play the sound.");
-        }
-    }
-
-    const renderMessageAudio = (props) => {
-        return (
-            <View {...props}>
-                <TouchableOpacity
-                    style={{
-                        backgroundColor: "#cce7ff", borderRadius: 10, margin: 5
-                    }}
-                    // call playSound function and pass the audio prop from the current message  from sendRecordedSound function
-                    onPress={() => playSound(props.currentMessage.audio)}
-                >
-                    <Text style={{
-                        textAlign: "center", color: 'black', padding: 5
-                    }}>Play Sound</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    }
-
+  const renderDay = (props) => {
     return (
-        <View style={[styles.container, { backgroundColor: color }]}>
-            {/* component from  Gifted Chat -> comes with own props, all in blue are the props
-            tell if what should happen  when the user sends a new message  */}
-            <GiftedChat style={styles.chat}
-                messages={messages}
-                renderSystemMessage={renderSystemMessage}
-                renderBubble={renderBubble}
-                renderDay={renderDay}
-                // call the component CustomActions from inside the function renderCustomActions 
-                // & pass it to prop renderActions -> those props passed to GiftedChat -> customize the behaviour 
-                renderActions={renderCustomActions}
-                renderCustomView={renderCustomView}
-                renderInputToolbar={renderInputToolbar}
-                renderMessageAudio={renderMessageAudio}
-                // call the function onUserSend -> when user sends new message
-                onSend={messages => onSend(messages)}
-                user={{
-                    _id: userID,
-                    name: name
-                }}
-            />
-            {/* if platform’s OS is Android -> add component KeyboardAvoidingView, otherwise do nothing
-            makes sure keyboard will not overlap the UI  */}
-            {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null}
-        </View>
+      <Day
+        {...stripKey(props)}
+        textStyle={{
+          color: "black",
+          backgroundColor: " rgba(248,248,248,0.6)",
+          paddingHorizontal: 15,
+          paddingVertical: 5,
+          fontWeight: "500",
+          borderRadius: 10,
+        }}
+      />
     );
-}
+  };
+
+  const renderSystemMessage = (props) => {
+    return (
+      <SystemMessage
+        {...stripKey(props)}
+        textStyle={{
+          color: "black",
+          backgroundColor: " rgba(248,248,248,0.6)",
+          paddingHorizontal: 15,
+          paddingVertical: 5,
+          fontWeight: "500",
+          borderRadius: 10,
+          margin: 3,
+        }}
+      />
+    );
+  };
+
+  const renderBubble = (props) => {
+    return (
+      <Bubble
+        {...stripKey(props)}
+        timeTextStyle={{
+          right: {
+            color: "black",
+          },
+        }}
+        textStyle={{
+          right: { color: "black" },
+        }}
+        wrapperStyle={{
+          right: { backgroundColor: "#d3edf8" },
+          left: { backgroundColor: "#FFF" },
+        }}
+      />
+    );
+  };
+
+  const renderInputToolbar = (props) => {
+    if (isConnected === true) {
+      return (
+        // passes all received props by renderInputToolbar, like isConnected to component
+        // InputToolbar from Gifted Chat, imported above
+        <InputToolbar {...stripKey(props)} />
+      );
+    } else return null;
+  };
+
+  // resposible for the action button -> +
+  const renderCustomActions = (props) => {
+    return (
+      // pass all the props received by renderCustomActions to CustomActions component
+      <CustomActions storage={storage} userID={userID} {...stripKey(props)} />
+    );
+  };
+
+  // adding location data to the message object
+  const renderCustomView = (props) => {
+    // extract current message object from the props
+    const { currentMessage } = props;
+    // checks if the currentMessage object contains a location property -> attach the location object in the getLocation()
+    // when you need to render multiple custom views, do so by adding if statements for the additional custom views
+    // if (currentMessage.3dModel) -> render a small 3d model viewport
+    if (currentMessage.location) {
+      // render a map
+      return (
+        <MapView
+          style={{
+            width: 150,
+            height: 100,
+            borderRadius: 13,
+            margin: 3,
+          }}
+          region={{
+            latitude: currentMessage.location.latitude,
+            longitude: currentMessage.location.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        />
+      );
+    }
+    return null;
+  };
+
+  const playSound = async (audioUri) => {
+    try {
+      // settings to play audio on iOS
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        staysActiveInBackground: true,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+        // Ensure the sound plays through the speakers
+        defaultToSpeaker: true,
+      });
+      if (soundObject) {
+        await soundObject.unloadAsync();
+      }
+      // console.log("Attempting to play sound from URI:", audioUri);
+      const { sound } = await Audio.Sound.createAsync({
+        uri: audioUri,
+      });
+      // assign the audio from the uri to the set soundObject
+      soundObject = sound;
+      // console.log("Sound loaded, playing...");
+      await soundObject.playAsync();
+    } catch (error) {
+      console.error("Error playing sound", error);
+      Alert.alert("Error", "Failed to play the sound.");
+    }
+  };
+
+  const renderMessageAudio = (props) => {
+    return (
+      <View {...stripKey(props)}>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#cce7ff",
+            borderRadius: 10,
+            margin: 5,
+          }}
+          // call playSound function and pass the audio prop from the current message  from sendRecordedSound function
+          onPress={() => playSound(props.currentMessage.audio)}
+        >
+          <Text
+            style={{
+              textAlign: "center",
+              color: "black",
+              padding: 5,
+            }}
+          >
+            Play Sound
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  //  change from Audio!!!
+  //   const AudioMessage = ({ currentMessage }) => {
+  //     const { player } = useAudioPlayer({ uri: currentMessage.audio });
+  //     const [isPlaying, setIsPlaying] = useState(false);
+
+  //     const togglePlay = async () => {
+  //       if (!player) return;
+
+  //       try {
+  //         if (isPlaying) {
+  //           await player.pause(); // ✅ NOT pauseAsync
+  //           setIsPlaying(false);
+  //         } else {
+  //           await player.play(); // ✅ NOT playAsync
+  //           setIsPlaying(true);
+  //         }
+  //       } catch (err) {
+  //         console.error("Audio play error:", err);
+  //       }
+  //     };
+
+  //     return (
+  //       <TouchableOpacity
+  //         onPress={togglePlay}
+  //         style={{
+  //           backgroundColor: "#cce7ff",
+  //           borderRadius: 10,
+  //           margin: 5,
+  //         }}
+  //       >
+  //         <Text style={{ textAlign: "center", color: "black", padding: 5 }}>
+  //           {isPlaying ? "Pause" : "Play"}
+  //         </Text>
+  //       </TouchableOpacity>
+  //     );
+  //   };
+  //   const renderMessageAudio = (props) => {
+  //     return <AudioMessage currentMessage={props.currentMessage} />;
+  //   };
+
+  return (
+    <View style={[styles.container, { backgroundColor: color }]}>
+      {/* component from  Gifted Chat -> comes with own props, all in blue are the props
+            tell if what should happen  when the user sends a new message  */}
+      <GiftedChat
+        style={styles.chat}
+        messages={messages}
+        renderSystemMessage={renderSystemMessage}
+        renderBubble={renderBubble}
+        renderDay={renderDay}
+        // call the component CustomActions from inside the function renderCustomActions
+        // & pass it to prop renderActions -> those props passed to GiftedChat -> customize the behaviour
+        renderActions={renderCustomActions}
+        renderCustomView={renderCustomView}
+        renderInputToolbar={renderInputToolbar}
+        renderMessageAudio={renderMessageAudio}
+        // call the function onUserSend -> when user sends new message
+        onSend={(messages) => onSend(messages)}
+        user={{
+          _id: userID,
+          name: name,
+        }}
+      />
+      {/* if platform’s OS is Android -> add component KeyboardAvoidingView, otherwise do nothing
+            makes sure keyboard will not overlap the UI  */}
+      {Platform.OS === "android" ? (
+        <KeyboardAvoidingView behavior="height" />
+      ) : null}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-    }
+  container: {
+    flex: 1,
+    justifyContent: "center",
+  },
 });
 
 export default Chat;
