@@ -1,5 +1,7 @@
 ## Chat App
+
 The chat application is built for mobile devices with React Native, offering a chat interface that lets users send messages, share images, audio, and their location.
+
 
 ## Technology Stack 
 - **React Native** : Framework for building cross-platform mobile applications using JavaScript and React.
@@ -89,10 +91,10 @@ As a user with a visual impairment, I want to use a chat app that is compatible 
 - Communication options allowing users to send images (from the library or camera), voice messages, and share their location.
 - Anonymous authentication through Google Firebase. Data storage via Google Firestore Database, supporting both online and offline access.
 
-
 ## App User Interface
 <img width="300" alt="image" src="https://github.com/alinalein/chat/assets/111589183/cb26b63e-0cb1-428c-a334-2ac4efd0a697">
 <img width="300" alt="image" src="https://github.com/alinalein/chat/assets/111589183/eb7a7cf3-4819-49a2-bfc8-2ed3aabbc616">
+
 
 
 
